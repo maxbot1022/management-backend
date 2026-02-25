@@ -62,11 +62,11 @@ public class FileController {
             tempFile.delete();
 
             result.put("code", 200);
-            result.put("data", Map.of(
-                "url", url,
-                "objectName", objectName,
-                "originalName", originalFilename
-            ));
+            Map<String, Object> data = new HashMap<>();
+            data.put("url", url);
+            data.put("objectName", objectName);
+            data.put("originalName", originalFilename);
+            result.put("data", data);
             result.put("msg", "上传成功");
             
             log.info("文件上传成功: {}", originalFilename);

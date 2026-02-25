@@ -6,7 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 小说整理任务服务
@@ -50,8 +55,8 @@ public class NovelTaskService {
         }
 
         try {
-            // TODO: 从OSS下载原始文本内容
-            String textContent = "这里需要实现从OSS下载文本";
+            // 从OSS下载原始文本内容
+            String textContent = downloadTextFromOss(task.getOriginalTextUrl());
             
             // 调用火山引擎处理
             String result = volcengineService.processNovelText(textContent, task.getPrompt());
@@ -68,6 +73,49 @@ public class NovelTaskService {
             task.setErrorMsg(e.getMessage());
             task.setRetryCount(task.getRetryCount() + 1);
             novelTaskMapper.updateById(task);
+        }
+    }
+
+    /**
+     * 从OSS下载文本内容
+     */
+    private String downloadTextFromOss(String fileUrl) {
+        try {
+            // 从URL中提取objectName
+            // URL格式: https://bucket.oss-region.aliyuncs.com/objectName?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxx
+            String objectName = extractObjectNameFromUrl(fileUrl);
+            
+            // 使用OSS客户端下载文件
+            InputStream inputStream = ossService.downloadFile(objectName);
+            
+            // 读取文本内容
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+                return reader.lines().collect(Collectors.joining("\n"));
+            }
+        } catch (Exception e) {
+            log.error("从OSS下载文本失败: {}", fileUrl, e);
+            throw new RuntimeException("下载文本失败", e);
+        }
+    }
+
+    /**
+     * 从URL中提取objectName
+     */
+    private String extractObjectNameFromUrl(String fileUrl) {
+        try {
+            // 去掉查询参数
+            String urlWithoutParams = fileUrl.split("\\?")[0];
+            // 提取path部分
+            java.net.URL url = new java.net.URL(urlWithoutParams);
+            String path = url.getPath();
+            // 去掉开头的 /
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            return path;
+        } catch (Exception e) {
+            log.error("解析URL失败: {}", fileUrl, e);
+            throw new RuntimeException("解析URL失败", e);
         }
     }
 
