@@ -97,6 +97,30 @@ public class OssService {
     }
 
     /**
+     * 下载文件
+     */
+    public InputStream downloadFile(String objectName) {
+        try {
+            return ossClient.getObject(ossProperties.getBucketName(), objectName).getObjectContent();
+        } catch (Exception e) {
+            log.error("下载文件失败: {}", objectName, e);
+            throw new RuntimeException("下载文件失败", e);
+        }
+    }
+
+    /**
+     * 下载文件
+     */
+    public InputStream downloadFile(String objectName) {
+        try {
+            return ossClient.getObject(ossProperties.getBucketName(), objectName).getObjectContent();
+        } catch (Exception e) {
+            log.error("下载文件失败: {}", objectName, e);
+            throw new RuntimeException("下载文件失败", e);
+        }
+    }
+
+    /**
      * 删除文件
      */
     public void deleteFile(String objectName) {
