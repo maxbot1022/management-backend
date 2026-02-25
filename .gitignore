@@ -1,0 +1,74 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IDE - Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IDE - VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application configurations - 不包含敏感信息的配置文件
+# 开发环境配置（包含敏感信息）
+**/application-dev.yml
+**/application-prod.yml
+**/application-local.yml
+
+# 但保留示例配置
+!**/application-dev.yml.example
+!**/application.yml
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Upload directory
+/tmp/
+/upload/
+/files/
+
+# Test coverage
+jacoco.exec
+*.exec
+htmlReport/
