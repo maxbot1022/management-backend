@@ -3,6 +3,7 @@ package com.maxbot.management.controller;
 import com.maxbot.management.service.OssService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,9 +39,9 @@ public class FileController {
     public Map<String, Object> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(defaultValue = "common") String folder) {
-        
+
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             // 创建临时目录
             Path tempPath = Paths.get(TEMP_DIR);
@@ -68,14 +69,14 @@ public class FileController {
             data.put("originalName", originalFilename);
             result.put("data", data);
             result.put("msg", "上传成功");
-            
+
             log.info("文件上传成功: {}", originalFilename);
         } catch (Exception e) {
             log.error("文件上传失败", e);
             result.put("code", 500);
             result.put("msg", "上传失败: " + e.getMessage());
         }
-        
+
         return result;
     }
 
@@ -85,6 +86,12 @@ public class FileController {
     @PostMapping("/upload/image")
     public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) {
         return upload(file, "images");
+    }
+
+    @GetMapping("/test/{id}/{token}")
+    public ResponseEntity<String> get(@PathVariable String id, @PathVariable String token) {
+        log.info(id + "===" + token);
+        return null;
     }
 
     /**
@@ -101,7 +108,7 @@ public class FileController {
     @PostMapping("/upload/text")
     public Map<String, Object> uploadText(@RequestParam("file") MultipartFile file) {
         Map<String, Object> result = upload(file, "texts");
-        
+
         // 读取文本内容
         if (result.get("code").equals(200)) {
             try {
@@ -113,7 +120,7 @@ public class FileController {
                 log.error("读取文本内容失败", e);
             }
         }
-        
+
         return result;
     }
 }

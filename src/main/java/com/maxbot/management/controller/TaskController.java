@@ -43,8 +43,36 @@ public class TaskController {
         return result;
     }
 
+    /**
+     * 根据整本小说文本URL，自动分段并批量创建小说整理任务
+     * 前端流程建议：先用 /file/upload/text 上传整本 txt，拿到 originalTextUrl 后调用本接口
+     */
+    @PostMapping("/novel/createFromWholeText")
+    public Map<String, Object> createNovelTasksFromWholeText(@RequestBody Map<String, Object> params) {
+        Long projectId = Long.valueOf(params.get("projectId").toString());
+        String taskNamePrefix = (String) params.get("taskNamePrefix");
+        String originalTextUrl = (String) params.get("originalTextUrl");
+        String prompt = (String) params.get("prompt");
+
+        List<NovelTask> tasks = novelTaskService.createTasksFromWholeNovel(
+                projectId,
+                taskNamePrefix,
+                originalTextUrl,
+                prompt
+        );
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("code", 200);
+        result.put("data", tasks);
+        result.put("msg", "整本小说分段任务创建成功");
+        return result;
+    }
+
     @PostMapping("/novel/submit/{id}")
     public Map<String, Object> submitNovelTask(@PathVariable Long id) {
+        // 这里只是快速排查用的入口日志，如不需要可后续删除或降级为 debug
+        org.slf4j.LoggerFactory.getLogger(TaskController.class)
+                .info("收到小说整理任务提交请求, taskId={}", id);
         novelTaskService.submitToVolcengine(id);
         Map<String, Object> result = new HashMap<>();
         result.put("code", 200);

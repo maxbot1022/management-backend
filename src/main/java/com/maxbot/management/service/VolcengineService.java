@@ -161,12 +161,16 @@ public class VolcengineService {
      */
     public String processNovelText(String text, String prompt) {
         try {
+            log.info("准备调用火山引擎小说整理接口, textLength={}, promptLength={}",
+                    text == null ? 0 : text.length(),
+                    prompt == null ? 0 : prompt.length());
+
             HttpPost httpPost = new HttpPost(volcengineProperties.getBaseUrl() + "/chat/completions");
             httpPost.setHeader("Authorization", "Bearer " + volcengineProperties.getApiKey());
             httpPost.setHeader("Content-Type", "application/json");
 
             JSONObject requestBody = new JSONObject();
-            requestBody.put("model", "doubao-pro"); // 使用豆包大模型
+            requestBody.put("model", "doubao-seed-2-0-pro-260215"); // 使用豆包大模型
             
             com.alibaba.fastjson.JSONArray messages = new com.alibaba.fastjson.JSONArray();
             
@@ -188,8 +192,9 @@ public class VolcengineService {
             httpPost.setEntity(new StringEntity(requestBody.toJSONString(), StandardCharsets.UTF_8));
 
             try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                int statusCode = response.getStatusLine().getStatusCode();
                 String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-                log.info("小说整理响应: {}", responseBody);
+                log.info("小说整理响应, statusCode={}, body={}", statusCode, responseBody);
                 
                 JSONObject jsonResponse = JSON.parseObject(responseBody);
                 return jsonResponse.getJSONArray("choices")
